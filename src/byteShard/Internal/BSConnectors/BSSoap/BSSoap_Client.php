@@ -12,7 +12,7 @@ use http\Cookie;
 class BSSoap_Client
 {
     private BSSoap_Message $soapMessage;
-    private                $BSSoap_wsse;
+    private ?BSSoap_wsse               $BSSoap_wsse;
     private $bespinSOAP_result;
 
     private ?CookieInterface $cookieObject   = null;

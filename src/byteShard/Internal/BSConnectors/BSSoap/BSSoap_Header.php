@@ -10,16 +10,16 @@ use SimpleXMLElement;
 
 class BSSoap_Header
 {
-    private        $wsa;
-    private        $wsse;
-    private        $messageID = null;
-    private string $prefix    = '';
+    private              $wsa;
+    private ?BSSoap_wsse $wsse      = null;
+    private              $messageID = null;
+    private string       $prefix    = '';
 
     public function __construct()
     {
     }
 
-    public function setWSSE(BSSoap_wsse $wsseClassObject)
+    public function setWSSE(BSSoap_wsse $wsseClassObject): void
     {
         $this->wsse = $wsseClassObject;
     }
@@ -91,7 +91,7 @@ class BSSoap_Header
                 return $header;*/
     }
 
-    public function getWSSEObject()
+    public function getWSSEObject(): ?BSSoap_wsse
     {
         if (!empty($this->wsse)) {
             return $this->wsse;
