@@ -11,14 +11,14 @@ use http\Cookie;
 
 class BSSoap_Client
 {
-    private $BSSoap_message;
-    private $BSSoap_wsse;
+    private BSSoap_Message $soapMessage;
+    private ?BSSoap_wsse               $BSSoap_wsse;
     private $bespinSOAP_result;
 
-    private $cookieObject   = null;
-    private $http_cookie;
-    private $http_useragent = 'BSSoap/1.0.0';
-    private $encoding       = 'ISO-8859-1';
+    private ?CookieInterface $cookieObject   = null;
+    private        $http_cookie;
+    private string $httpUseragent = 'BSSoap/1.0.0';
+    private string $encoding      = 'ISO-8859-1';
 
     private $wsseToken;
 
@@ -39,9 +39,9 @@ class BSSoap_Client
     public function __construct($endpoint, BSSoap_Message $BSSoap_message)
     {
         ini_set('memory_limit', -1);
-        $this->curl_endpoint  = $endpoint;
-        $this->BSSoap_message = $BSSoap_message;
-        $this->BSSoap_wsse    = $this->BSSoap_message->getWSSEObject();
+        $this->curl_endpoint = $endpoint;
+        $this->soapMessage   = $BSSoap_message;
+        $this->BSSoap_wsse   = $this->soapMessage->getWSSEObject();
     }
 
     public function setEncoding($encoding)
@@ -59,7 +59,7 @@ class BSSoap_Client
         $this->callSoapServer();
         if ($this->curl_response !== false) {
             $this->parseSoapResponse();
-            $result_index = ($resultName !== null) ? $resultName : $this->BSSoap_message->getAction().'Result';
+            $result_index = ($resultName !== null) ? $resultName : $this->soapMessage->getAction().'Result';
             if (isset($this->bespinSOAP_result['Body'])) {
                 if (isset($this->bespinSOAP_result['Body'][$result_index])) {
                     return $this->bespinSOAP_result['Body'][$result_index];
@@ -79,11 +79,9 @@ class BSSoap_Client
         $this->http_cookie = $cookie;
     }
 
-    public function setCookieObject(cookie $cookieObject)
+    public function setCookieObject(CookieInterface $cookieObject): void
     {
-        if (($cookieObject instanceof cookie) && method_exists($cookieObject, 'getCookieString') === true) {
-            $this->cookieObject = $cookieObject;
-        }
+        $this->cookieObject = $cookieObject;
     }
 
     public function setHTTPHeader($headerArray)
@@ -93,7 +91,7 @@ class BSSoap_Client
 
     private function getHTTPHeader()
     {
-        $http_header[] = 'User-Agent: '.$this->http_useragent;
+        $http_header[] = 'User-Agent: '.$this->httpUseragent;
         $http_header[] = 'Content-Type: text/xml; charset='.$this->encoding;
         $http_header[] = 'Connection: Keep-Alive';
         $http_header[] = 'Keep-Alive: '.($this->curl_timeout - 1);
@@ -111,7 +109,7 @@ class BSSoap_Client
     private function callSoapServer()
     {
         // generate message ID for this request
-        $this->BSSoap_message->generateMessageID();
+        $this->soapMessage->generateMessageID();
         for ($retry = 0; $retry <= $this->curl_maxRecalls; $retry++) {
             $this->curl_response      = null;
             $this->curl_response_info = null;
@@ -146,9 +144,9 @@ class BSSoap_Client
 
     private function curl_exec()
     {
-        $message_encoding = $this->BSSoap_message->getEncoding();
+        $message_encoding = $this->soapMessage->getEncoding();
         if ($message_encoding === null) {
-            $this->BSSoap_message->setEncoding($this->encoding);
+            $this->soapMessage->setEncoding($this->encoding);
         }
 
         // generate a cookie for this request if needed
@@ -181,7 +179,7 @@ class BSSoap_Client
         curl_setopt($this->curl_handler, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($this->curl_handler, CURLOPT_POST, true);
         curl_setopt($this->curl_handler, CURLOPT_HTTPHEADER, $this->getHTTPHeader());
-        curl_setopt($this->curl_handler, CURLOPT_POSTFIELDS, $this->BSSoap_message->getMessage());
+        curl_setopt($this->curl_handler, CURLOPT_POSTFIELDS, $this->soapMessage->getMessage());
         curl_setopt($this->curl_handler, CURLOPT_AUTOREFERER, true);
         curl_setopt($this->curl_handler, CURLOPT_COOKIESESSION, true);
         curl_setopt($this->curl_handler, CURLOPT_FRESH_CONNECT, true);
@@ -202,7 +200,7 @@ class BSSoap_Client
         curl_close($this->curl_handler);
         $this->curl_handler = null;
         if ($message_encoding === null) {
-            $this->BSSoap_message->setEncoding(null);
+            $this->soapMessage->setEncoding(null);
         }
     }
 
@@ -210,7 +208,7 @@ class BSSoap_Client
     {
         $correctMessageID = null;
         if ($this->curl_http_code === 200) {
-            return $this->BSSoap_message->checkMessageID($this->curl_response);
+            return $this->soapMessage->checkMessageID($this->curl_response);
         }
         return $correctMessageID;
     }

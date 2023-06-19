@@ -122,7 +122,7 @@ class BSSoap_Message
         return $result;
     }
 
-    public function getWSSEObject()
+    public function getWSSEObject(): ?BSSoap_wsse
     {
         if (!empty($this->bespinSOAP_header)) {
             return $this->bespinSOAP_header->getWSSEObject();

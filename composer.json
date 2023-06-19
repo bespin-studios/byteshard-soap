@@ -20,7 +20,6 @@
   "require": {
     "php": "^8.1",
     "ext-simplexml": "*",
-    "ext-dom": "*",
-    "ext-http": "*"
+    "ext-dom": "*"
   }
 }
