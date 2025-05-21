@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/bespin-studios/byteshard-soap/compare/v1.0.0...v1.0.1) (2025-05-21)
+
+
+### Bug Fixes
+
+* pipeline and php 8.4 warnings ([03e935d](https://github.com/bespin-studios/byteshard-soap/commit/03e935d703bd35b498b2d1bce261548c72d6c6af))
+
 # 1.0.0 (2023-06-19)
 
 
