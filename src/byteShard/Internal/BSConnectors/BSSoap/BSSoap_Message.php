@@ -19,7 +19,7 @@ class BSSoap_Message
     private $xml_encoding;
     private $namespace;
 
-    public function __construct(BSSoap_Body $bespinSOAP_body, BSSoap_Header $bespinSOAP_header = null, $encoding = null, $xmlVersion = null)
+    public function __construct(BSSoap_Body $bespinSOAP_body, ?BSSoap_Header $bespinSOAP_header = null, $encoding = null, $xmlVersion = null)
     {
         $this->BSSoap_Body   = $bespinSOAP_body;
         $this->BSSoap_Header = $bespinSOAP_header;
